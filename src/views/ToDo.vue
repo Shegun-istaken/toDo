@@ -149,6 +149,11 @@ footer{
   header div:first-child {
     gap: 24px;
   }
+
+  div.createNew{
+    width: 600px;
+    margin: 48px auto;
+  }
 }
 
 @media only screen and (max-width: 690px) {
@@ -170,5 +175,25 @@ footer{
   div.listItems {
     justify-content: center;
   }
+
+  div.createNew{
+    width: 320px;
+  }
+}
+
+@media only screen and (max-width: 390px){
+    div.createNew{
+        width: auto;
+        margin: 48px auto;
+    }
+
+    div.createNew h3{
+        width: 100%;
+        font-size: 16px;
+    }
+
+    div.createNew button{
+        width: 100%;
+    }
 }
 </style>
