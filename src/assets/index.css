@@ -1,0 +1,26 @@
+:root {
+  --verdigris: #17bebbff;
+  --raisin-black: #2e282aff;
+  --golden-brown: #895b1eff;
+  --buff: #edb88bff;
+  --ultra-violet: #6761a8ff;
+}
+
+body *{
+    padding: 0;
+    margin: 0; 
+}
+
+html{
+    box-sizing: border-box;
+}
+
+body{
+    background-color: var(--buff);
+    font-family: 'Open Sans', sans-serif;
+}
+
+button:hover, button:focus{
+    cursor: pointer;
+    outline: none;
+}
