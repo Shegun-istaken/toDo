@@ -1,11 +1,24 @@
 <script setup>
-import { reactive } from 'vue'
+import { reactive, onBeforeMount } from 'vue'
 import SideBar from '@/components/SideBar.vue'
 import ListItem from '@/components/ListItem.vue'
 import ItemDetailsModal from '@/components/ItemDetailsModal.vue'
 import { useModalStore } from '@/stores/useModalStore.js'
 import { useListItems } from '@/stores/useListItems.js'
 import { useUserStore } from '../stores/useUserStore'
+
+onBeforeMount(() => {
+  if (localStorage.getItem('todoTasks')) {
+    let saved = JSON.parse(localStorage.getItem('todoTasks'))
+    saved.forEach((element) => {
+      tasks.addToList(element)
+      if (element.id > tasks.lastIndex) {
+        tasks.lastIndex = element.id
+      }
+    })
+  }
+  tasks.lastIndex = 0
+})
 
 const tasks = useListItems()
 const modal = useModalStore()
@@ -47,6 +60,7 @@ function handleToggle() {
     </div>
     <div>
       <h3 v-if="user.userName">{{ `hi ${user.userName}` }}</h3>
+      <button v-else className="clear" @click="tasks.clearAll">Clear All</button>
       <button @click="handleToggle" className="plus"><h1>+</h1></button>
     </div>
   </header>
@@ -88,14 +102,35 @@ header div:first-child {
   align-items: center;
 }
 
+header div:last-child {
+  display: flex;
+  align-items: center;
+  column-gap: 128px;
+}
+
 button.plus {
   margin: 0;
   padding: 0;
   border: none;
   background-color: transparent;
 }
+
+button.clear {
+  background-color: transparent;
+  border: 1px solid hsla(0, 0%, 0%, 0.2);
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+
+button.clear:hover {
+  background-color: hsla(0, 0%, 0%, 0.03);
+}
 button.plus h1 {
   font-size: 40px;
+}
+
+button.clear {
+  font-size: 18px;
 }
 
 main {
@@ -109,6 +144,7 @@ div.listItems {
   justify-content: flex-start;
   row-gap: 32px;
   column-gap: 32px;
+  margin-right: 24px;
 }
 
 div.createNew {
@@ -129,9 +165,9 @@ div.createNew button {
   color: white;
 }
 
-footer{
- width: 128px;
- margin: 64px auto;
+footer {
+  width: 128px;
+  margin: 64px auto;
 }
 
 @media only screen and (max-width: 960px) {
@@ -150,7 +186,11 @@ footer{
     gap: 24px;
   }
 
-  div.createNew{
+  /* header div:last-child {
+    gap: 24px;
+  } */
+
+  div.createNew {
     width: 600px;
     margin: 48px auto;
   }
@@ -160,12 +200,13 @@ footer{
   header {
     flex-direction: column;
     margin: 48px 0px 0px 0px;
+    row-gap: 24px;
   }
 
   header div {
     /* gap: 64px; */
     flex-direction: column;
-    row-gap: 24px;
+    row-gap: 8px;
   }
 
   header div:first-child {
@@ -176,24 +217,24 @@ footer{
     justify-content: center;
   }
 
-  div.createNew{
+  div.createNew {
     width: 320px;
   }
 }
 
-@media only screen and (max-width: 390px){
-    div.createNew{
-        width: auto;
-        margin: 48px auto;
-    }
+@media only screen and (max-width: 390px) {
+  div.createNew {
+    width: auto;
+    margin: 48px auto;
+  }
 
-    div.createNew h3{
-        width: 100%;
-        font-size: 16px;
-    }
+  div.createNew h3 {
+    width: 100%;
+    font-size: 16px;
+  }
 
-    div.createNew button{
-        width: 100%;
-    }
+  div.createNew button {
+    width: 100%;
+  }
 }
 </style>

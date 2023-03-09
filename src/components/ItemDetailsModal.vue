@@ -9,8 +9,7 @@ const tasks = useListItems()
 const modal = useModalStore()
 
 const props = defineProps({
-  edit: { required: false,},
-//   index: {required: false,}
+  edit: { required: false }
 })
 
 onBeforeMount(() => {
@@ -22,7 +21,6 @@ onBeforeMount(() => {
     state.done = tasks.listItems[modal.indexStore].done
     state.dropDown = tasks.listItems[modal.indexStore].dropDown
   }
-
 })
 
 const state = reactive({
@@ -31,7 +29,7 @@ const state = reactive({
   description: '',
   tags: [],
   done: false,
-  dropDown: false,
+  dropDown: false
 })
 
 function handleClick(tag) {
@@ -54,19 +52,22 @@ function submit() {
     tasks.updateItem(modal.indexStore, state)
     // tasks.listItems[modal.indexStore] = {...state};
     clearState()
-    modal.changeEdit("off");
+    modal.changeEdit('off')
     modal.toggleIsModal()
+    tasks.addtoLocalStorage()
   } else {
-    state.id = tasks.listItems.length + 1
+    state.id = tasks.lastIndex + 1
+    tasks.lastIndex = tasks.lastIndex + 1
     tasks.addToList({ ...state })
     clearState()
     modal.toggleIsModal()
+    tasks.addtoLocalStorage()
   }
 }
 
-function handleCancel(){
-    modal.changeEdit("off");
-    modal.toggleIsModal();
+function handleCancel() {
+  modal.changeEdit('off')
+  modal.toggleIsModal()
 }
 </script>
 
@@ -102,8 +103,7 @@ function handleCancel(){
           v-for="(tag, index) in tags"
           :key="`${tag}${index}`"
         >
-          <SideButtons :type="tag" :select="true" 
-          :tags="props.edit && state.tags" />
+          <SideButtons :type="tag" :select="true" :tags="props.edit && state.tags" />
         </li>
       </ul>
     </main>
@@ -205,65 +205,56 @@ div.topButtons > button:disabled:hover {
   background-color: var(--golden-brown);
 }
 
-@media only screen and (max-width: 960px){
-
-  div.modal{
+@media only screen and (max-width: 960px) {
+  div.modal {
     width: 640px;
     margin-left: -320px;
   }
-
 }
 
-@media only screen and (max-width: 768px){
-
-
-  div.modal{
+@media only screen and (max-width: 768px) {
+  div.modal {
     width: 480px;
     margin-left: -240px;
   }
 
-  ul{
+  ul {
     flex-wrap: wrap;
     justify-content: flex-start;
   }
-
 }
 
-@media only screen and (max-width: 560px){
-
-  div.topButtons{
+@media only screen and (max-width: 560px) {
+  div.topButtons {
     flex-direction: column;
     row-gap: 8px;
   }
 
-  div.modal{
+  div.modal {
     width: 320px;
     margin-left: -160px;
   }
 
-  ul{
+  ul {
     flex-direction: row;
     flex-wrap: wrap;
   }
 
-  li{
+  li {
     display: inline;
   }
-
 }
 
-@media only screen and (max-width: 480px){
-  div.modal{
+@media only screen and (max-width: 480px) {
+  div.modal {
     margin-left: -180px;
   }
 }
 
-@media only screen and (max-width: 320px){
-
-  div.modal{
+@media only screen and (max-width: 320px) {
+  div.modal {
     width: 240px;
     margin-left: -120px;
   }
-
 }
 </style>

@@ -38,7 +38,7 @@ function handleEdit() {
 
 <template>
   <div
-    v-if="!tasks.hideDone || !data.done"
+    v-if="!tasks.hideDone || !data.done "
     className="item"
     :style="data.done && { backgroundColor: 'rgb(228, 228, 204)' }"
   >

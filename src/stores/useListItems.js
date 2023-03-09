@@ -14,6 +14,7 @@ export const useListItems = defineStore('useList', () => {
     // }
   ])
   const hideDone = ref(false)
+  const lastIndex = ref(0)
 
   function toggleDropDown(id) {
     listItems.forEach((item, index) => {
@@ -45,6 +46,7 @@ export const useListItems = defineStore('useList', () => {
         listItems.splice(index, 1)
       }
     })
+    addtoLocalStorage()
   }
 
   function toggleDone(id) {
@@ -59,15 +61,27 @@ export const useListItems = defineStore('useList', () => {
     hideDone.value = !hideDone.value
   }
 
+  function addtoLocalStorage() {
+    localStorage.setItem('todoTasks', JSON.stringify(listItems))
+  }
+
+  function clearAll() {
+    listItems.length = 0
+    addtoLocalStorage()
+  }
+
   return {
     listItems,
     hideDone,
+    lastIndex,
     addToList,
     removeItem,
     toggleDone,
     toggleHideDone,
     updateItem,
     toggleDropDown,
-    noDropDown
+    noDropDown,
+    addtoLocalStorage,
+    clearAll
   }
 })
