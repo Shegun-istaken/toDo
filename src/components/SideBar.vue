@@ -1,7 +1,7 @@
 <script setup>
 import SideButtons from '@/components/SideButtons.vue'
 import {tags} from "@/assets/data/listItems.js"
-import { useListItems } from '@/src/stores/uselistItems';
+import { useListItems } from '@/stores/useListItems.js'
 
 const tasks = useListItems();
 const props = defineProps({
