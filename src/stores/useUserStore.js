@@ -3,7 +3,6 @@ import { ref, watch } from 'vue'
 import { isLoggedInEx } from '../composables/isLoggedIn'
 
 export const useUserStore = defineStore('useUser', () => {
-  // const userToken = ref('')
   const user = ref({})
   const isLoggedIn = ref(false)
 

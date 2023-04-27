@@ -1,32 +1,10 @@
 <script setup>
-import { useListItems } from '@/stores/useListItems.js'
 import DisplayTime from './DisplayTime.vue'
-
-const tasks = useListItems()
-
-const props = defineProps({
-  data: {
-    required: true,
-    type: Object
-  },
-  index: {
-    required: false
-  },
-  onDelete: {
-    required: true
-  },
-  onDone: {
-    required: true
-  },
-  onItemClick: {
-    required: true
-  }
-})
 </script>
 
 <template>
   <div
-    v-if="!tasks.hideDone || !data?.done"
+    v-if="!data?.done"
     className="item"
     :style="data.done && { backgroundColor: 'rgb(228, 228, 204)' }"
   >
