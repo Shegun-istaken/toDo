@@ -1,48 +1,17 @@
 <script setup>
-import { reactive, onBeforeMount } from 'vue'
-import SideBar from '@/components/SideBar.vue'
+import { onBeforeMount, ref } from 'vue'
 import ListItem from '@/components/ListItem.vue'
 import ItemDetailsModal from '@/components/ItemDetailsModal.vue'
 import { useModalStore } from '@/stores/useModalStore.js'
-import { useListItems } from '@/stores/useListItems.js'
-import { useUserStore } from '../stores/useUserStore'
+import { useReminderStore } from '../stores/useReminderStore'
 
-onBeforeMount(() => {
-  if (localStorage.getItem('todoTasks')) {
-    let saved = JSON.parse(localStorage.getItem('todoTasks'))
-    saved.forEach((element) => {
-      tasks.addToList(element)
-      if (element.id > tasks.lastIndex) {
-        tasks.lastIndex = element.id
-      }
-    })
-  }
-  tasks.lastIndex = 0
-})
-
-const tasks = useListItems()
+const reminderStore = useReminderStore()
 const modal = useModalStore()
-const user = useUserStore()
+const itemData = ref({})
 
-const state = reactive({
-  filter: '',
-  displaying: 'All Tasks'
+onBeforeMount(async () => {
+  await reminderStore.getAllTodos()
 })
-
-window.onclick = (e) => {
-  if (e.target.name != 'dropDown') {
-    tasks.noDropDown()
-  }
-}
-
-function handleClick(tag) {
-  if (tag == 'All Tasks') {
-    state.filter = ''
-  } else {
-    state.filter = `${tag}`
-  }
-  state.displaying = tag
-}
 
 function handleToggle() {
   if (modal.editMode) {
@@ -50,47 +19,59 @@ function handleToggle() {
   }
   modal.toggleIsModal()
 }
+
+async function handleDelete(index) {
+  const id = reminderStore.reminderList[index].id
+  reminderStore.handleTodos('DELETE', id)
+}
+
+async function handleDone(index) {
+  const id = reminderStore.reminderList[index].id
+  reminderStore.handleTodos('PATCH', id)
+}
+
+async function handleItemClick(index) {
+  const id = reminderStore.reminderList[index].id
+  itemData.value = await reminderStore.handleTodos('GET', id)
+  modal.changeEdit('on')
+  modal.toggleIsModal()
+}
 </script>
 
 <template>
   <header>
     <div>
-      <h1>todo</h1>
-      <h2>{{ state.displaying }}</h2>
+      <h2>All Tasks</h2>
     </div>
     <div>
-      <h3 v-if="user.userName">{{ `hi ${user.userName}` }}</h3>
-      <button v-else className="clear" @click="tasks.clearAll">Clear All</button>
       <button @click="handleToggle" className="plus"><h1>+</h1></button>
     </div>
   </header>
-  <main>
-    <SideBar :sideButtonClick="handleClick" />
+  <main :style="reminderStore.reminderList?.length < 1 && {justifyContent: 'center'}">
+    <!-- <SideBar :sideButtonClick="handleClick" /> -->
     <ItemDetailsModal v-if="!modal.editMode" />
-    <ItemDetailsModal v-if="modal.editMode" :edit="true" />
-    <div v-if="tasks.listItems.length > 0" className="listItems">
+    <ItemDetailsModal v-if="modal.editMode" :view="itemData" />
+    <div v-if="reminderStore.reminderList?.length > 0" className="listItems">
       <ListItem
-        v-for="(item, index) in tasks.listItems.filter(
-          state.filter ? (item) => item.tags.includes(`${state.filter}`) : (item) => item
-        )"
+        v-for="(item, index) in reminderStore.reminderList"
         :key="item.id"
         :data="item"
         :index="index"
+        :onDelete="(e) => handleDelete(index, e)"
+        :onDone="(e) => handleDone(index, e)"
+        :onItemClick="(e) => handleItemClick(index, e)"
       />
     </div>
     <div v-else className="createNew">
-      <h3>You do not have any tasks</h3>
+      <h3 @click="testAPI">You do not have any tasks</h3>
       <button @click="modal.toggleIsModal">Create a New Task</button>
     </div>
   </main>
-  <footer>
-    <small> ToDo App | Shegun</small>
-  </footer>
 </template>
 
 <style scoped>
 header {
-  margin: 20px 80px 20px 40px;
+  margin: 20px 64px 20px 64px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -134,7 +115,7 @@ button.clear {
 }
 
 main {
-  margin: 20px 20px 20px 40px;
+  /* margin: 20px 20px 20px 40px; */
   display: flex;
 }
 
@@ -144,7 +125,7 @@ div.listItems {
   justify-content: flex-start;
   row-gap: 32px;
   column-gap: 32px;
-  margin-right: 24px;
+  margin: 0 64px;
 }
 
 div.createNew {
@@ -163,11 +144,6 @@ div.createNew button {
   border-radius: 8px;
   background-color: var(--ultra-violet);
   color: white;
-}
-
-footer {
-  width: 128px;
-  margin: 64px auto;
 }
 
 @media only screen and (max-width: 960px) {

@@ -1,13 +1,8 @@
 <script setup>
-import CircleTag from './CircleTag.vue'
-import more from '@/assets/icons/more.svg'
-// import { reactive } from 'vue'
 import { useListItems } from '@/stores/useListItems.js'
-// import ItemDetailsModal from './ItemDetailsModal.vue'
-import { useModalStore } from '../stores/useModalStore'
+import DisplayTime from './DisplayTime.vue'
 
 const tasks = useListItems()
-const modal = useModalStore()
 
 const props = defineProps({
   data: {
@@ -16,57 +11,37 @@ const props = defineProps({
   },
   index: {
     required: false
+  },
+  onDelete: {
+    required: true
+  },
+  onDone: {
+    required: true
+  },
+  onItemClick: {
+    required: true
   }
 })
-
-// const data = reactive(props.task)
-// const state = reactive({
-//   dropDown: false
-// })
-
-// function dropDown() {
-//   state.dropDown = !state.dropDown
-// }
-
-function handleEdit() {
-  modal.changeEdit('on')
-  modal.setIndexStore(props.index)
-  modal.toggleIsModal()
-}
-
 </script>
 
 <template>
   <div
-    v-if="!tasks.hideDone || !data.done "
+    v-if="!tasks.hideDone || !data?.done"
     className="item"
     :style="data.done && { backgroundColor: 'rgb(228, 228, 204)' }"
   >
     <div className="itemHeader">
-      <h2 :style="data.done && { textDecoration: 'line-through' }">
-        {{ data.title.length > 15 ? `${data.title.slice(0, 14)}...` : data.title }}
+      <h2 :style="data?.done && { textDecoration: 'line-through' }">
+        {{ data.todo.length > 10 ? `${data.todo.slice(0, 14)}...` : data.todo }}
       </h2>
-      <button @click="tasks.toggleDropDown(data.id)"><img name="dropDown" :src="more" alt="more icon" /></button>
+      <button @click="onItemClick">See More</button>
     </div>
-    <p className="desc" :style="data.done && { textDecoration: 'line-through' }">
-      {{
-        data.description.length > 140 ? `${data.description.slice(0, 139)}...` : data.description
-      }}
-    </p>
-    <div className="lowerRow">
-      <div v-if="data.tags" className="tags">
-        <CircleTag v-for="tag in data.tags" :key="tag" :type="tag" />
-      </div>
-      <div>
-        <label className="Done"
-          >Done
-          <input type="checkbox" :checked="data.done" @change="tasks.toggleDone(data.id)" />
-        </label>
-      </div>
+    <div>
+      <DisplayTime :due="data.due" :nextReminder="data.remindMe" />
     </div>
-    <div v-if="data.dropDown" className="dropDown">
-      <button @click="handleEdit">Edit</button>
-      <button @click="tasks.removeItem(data.id)">Delete</button>
+    <div className="buttons">
+      <button @click.prevent="onDelete">Delete</button>
+      <label>Done<input @click.prevent="onDone" type="checkbox" v-model="data.done" /></label>
     </div>
   </div>
 </template>
@@ -74,7 +49,7 @@ function handleEdit() {
 <style scoped>
 div.item {
   position: relative;
-  width: 320px;
+  width: 280px;
   background-color: beige;
   padding: 24px;
   border-radius: 16px;
@@ -82,7 +57,7 @@ div.item {
   border: none;
   display: flex;
   flex-direction: column;
-  row-gap: 4px;
+  row-gap: 16px;
   transition: 0.2s ease-in-out;
   justify-content: space-between;
 }
@@ -101,6 +76,16 @@ div.itemHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+div.itemHeader button {
+  background-color: var(--buff);
+  padding: 4px;
+  border-radius: 4px;
+}
+
+div.itemHeader button:hover {
+  background-color: #ecb27f;
 }
 
 button {
@@ -154,21 +139,41 @@ p.desc {
   width: 98%;
 }
 
-@media only screen and (max-width: 960px){
+div.buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-  div.item{
+div.buttons button:first-child {
+  background-color: rgb(190, 5, 5);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: 0.2s ease-in-out;
+}
+
+div.buttons button:first-child:hover {
+  opacity: 0.7;
+}
+
+div.buttons label {
+  display: flex;
+  justify-content: center;
+  column-gap: 4px;
+}
+
+@media only screen and (max-width: 960px) {
+  div.item {
     width: 220px;
     row-gap: 16px;
     justify-content: space-between;
   }
-
 }
 
-@media only screen and (max-width: 690px){
-
-  div.item{
+@media only screen and (max-width: 690px) {
+  div.item {
     width: 80%;
   }
-
 }
 </style>

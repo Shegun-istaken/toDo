@@ -4,7 +4,6 @@ import { ref } from 'vue'
 export const useModalStore = defineStore('useModal', () => {
   const isModal = ref(false)
   const editMode = ref(false)
-
   const indexStore = ref()
 
   function toggleIsModal() {
@@ -26,5 +25,5 @@ export const useModalStore = defineStore('useModal', () => {
     indexStore.value = value
   }
 
-  return { isModal, editMode, indexStore, toggleIsModal, changeEdit, setIndexStore }
+  return { isModal, editMode, indexStore, toggleIsModal, changeEdit, setIndexStore}
 })

@@ -1,102 +1,145 @@
 <script setup>
-import SideButtons from '@/components/SideButtons.vue'
-import {tags} from "@/assets/data/listItems.js"
-import { useListItems } from '@/stores/useListItems.js'
+import menu from '@/assets/icons/menu.svg'
+// import { isLoggedIn } from '../composables/isLoggedIn'
+import { RouterLink, useRouter } from 'vue-router'
+import { ref } from 'vue'
+import { useUserStore } from '../stores/useUserStore';
 
-const tasks = useListItems();
-const props = defineProps({
-  sideButtonClick : {
-    required: false,
-    type: Function,
+const userStore = useUserStore()
+const closeMenu = ref(false)
+const router = useRouter()
+
+function toggleMenu() {
+  closeMenu.value = !closeMenu.value
+}
+
+const isLoggedIn = ref(false)
+
+function handleSignOut() {
+  router.push('/')
+  userStore.signUserOut()
+}
+
+const closeModal = (event) => {
+  if (!event.target.closest('.menu')) {
+    closeMenu.value = false
   }
-})
-
+}
 </script>
 
 <template>
-  <div className="sideBar">
-    <div className="sideButtons">
-      <SideButtons type="all" @click="props.sideButtonClick('All Tasks', $event)" />
-      <SideButtons v-for="(tag, index) in tags" :key="`${tag}${index}`" :type="tag" @click="props.sideButtonClick(tag, $event)" />
+  <div className="modalMain">
+    <div v-if="userStore.isLoggedIn" className="userInfo">
+      <p>Welcome Segun</p>
+      <!-- <p>
+        <small>{{ user.userData.email }}</small>
+      </p> -->
     </div>
-    <div className="hideDone">
-      <input id="hideDone" @change="tasks.toggleHideDone" :checked="tasks.hideDone" type="checkbox" />
-      <label for="hideDone">Hide Done Tasks</label>
-    </div>
+    <img className="menu" :src="menu" alt="menu icon" @click="toggleMenu" />
   </div>
+
+  <main v-if="closeMenu" id="menuModal" @click="closeModal">
+    <nav className="mobileNav">
+      <RouterLink to="/"><button className="homeButton">Home</button></RouterLink>
+      <RouterLink to="login" v-if="!isLoggedIn">
+        <button>Login</button>
+      </RouterLink>
+      <RouterLink to="/signup" v-if="!isLoggedIn">
+        <button>Sign Up</button>
+      </RouterLink>
+      <div v-else className="access">
+        <!-- <button className="mobileCart">Cart <img :src="cart" alt="cartIcon" /></button> -->
+        <button @click="handleSignOut">Sign Out</button>
+      </div>
+    </nav>
+  </main>
 </template>
 
 <style scoped>
-div.sideBar {
-  width: 20%;
+div.modalMain {
   display: flex;
-  flex-direction: column;
-  gap: 24px;
+  gap: 32px;
 }
 
-button {
+main#menuModal {
+  background-color: transparent;
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   margin: 0;
   padding: 0;
-  border: none;
-  background-color: transparent;
+}
+div.menuModal {
+  z-index: 2;
+}
+img.menu {
+  width: 48px;
 }
 
-label {
-  font-weight: 400;
-  font-size: 16px;
+a {
+  color: black;
+  text-decoration: none;
+  font-size: 14px;
+  margin: 0px;
+  padding: 0px;
 }
 
-div.sideButtons {
-  margin-top: 24px;
+nav.mobileNav {
+  position: absolute;
+  top: 56px;
+  right: 64px;
+  background-color: var(--platinum);
   display: flex;
   flex-direction: column;
-  row-gap: 16px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
 }
-div.hideDone {
+
+nav.mobileNav button {
+  padding: 16px 0px;
+  background-color: var(--ultra-violet);
+  width: 128px;
+  margin-top: 2px;
+}
+
+nav.mobileNav button.homeButton {
+  margin-top: 0;
+}
+
+/* div.access button{
+    border-
+} */
+
+button.mobileCart {
   display: flex;
   align-items: center;
+  justify-content: center;
+}
+button.mobileCart img {
+  width: 16px;
 }
 
-@media only screen and (max-width: 960px){
-
-  div.sideBar{
-    width: 100%;;
-    align-items: center;
-    row-gap: 8px;
-    /* justify-content: space-between; */
+@media only screen and (max-width: 470px) {
+  div.userInfo {
+    display: none;
   }
-
-  div.sideBar div.hideDone{
-    padding: 5px 0px;
-  }
-  div.sideButtons{
-    flex-flow: row wrap;
-    gap: 10px;
-    width: 80%;
-    justify-content: space-between;
-  }
-
-  div.hideDone{
-    /* background-color: var(--raisin-black); */
-    /* border-radius: 8px; */
-    /* color: white; */
-  }
-
 }
 
-@media only screen and (max-width: 690px){
-  div.sideButtons h3 {
-    visibility: hidden;
-    color: red;
+@media only screen and (max-width: 400px) {
+  nav.mobileNav {
+    top: 106px;
+    right: 0;
+    left: 0;
+    margin: auto;
+    width: 256px;
   }
 
-  div.sideButtons{
-    margin-top: 8px;
+  nav.mobileNav button {
+    width: 256px;
   }
-  div.sideBar{
-    margin: 0px;
-    padding: 0px;
-  }
-
 }
 </style>

@@ -6,21 +6,90 @@
   --ultra-violet: #6761a8ff;
 }
 
-body *{
-    padding: 0;
-    margin: 0; 
+body * {
+  padding: 0;
+  margin: 0;
 }
 
-html{
-    box-sizing: border-box;
+html {
+  box-sizing: border-box;
 }
 
-body{
-    background-color: var(--buff);
-    font-family: 'Open Sans', sans-serif;
+body {
+  background-color: var(--buff);
+  font-family: 'Open Sans', sans-serif;
 }
 
-button:hover, button:focus{
-    cursor: pointer;
-    outline: none;
+button:hover,
+button:focus {
+  cursor: pointer;
+  outline: none;
+}
+
+input:focus,
+input:hover {
+  outline: 0;
+}
+
+button.cta{
+  background-color:var(--ultra-violet);
+  color: white;
+  border: none;
+}
+
+p.errorText{
+  font-size: 14px;
+  color: rgb(182, 3, 3);
+}
+
+main.auth {
+  margin: 40px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+}
+
+main.auth form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+main.auth label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+main.auth input {
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+}
+
+main.auth button.authButton {
+  background-color: var(--ultra-violet);
+  border-radius: 8px;
+  border: none;
+  padding: 8px 32px;
+  color: white;
+  transition: 0.2s ease-in-out;
+}
+
+main.auth button.otherButton {
+  background-color: hsla(245, 26%, 71%, 0.2);
+  border: 0;
+  padding: 8px;
+  transition: 0.2s ease-in-out;
+}
+
+main.auth button.authButton:hover {
+  opacity: 0.8;
+}
+
+main.auth button.otherButton:hover {
+  background-color: hsla(245, 26%, 71%, 0.4);
 }

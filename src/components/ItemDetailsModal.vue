@@ -1,67 +1,52 @@
 <script setup>
-import SideButtons from './SideButtons.vue'
-import { tags } from '@/assets/data/listItems.js'
-import { reactive, onBeforeMount } from 'vue'
+import { ref, reactive, onBeforeMount } from 'vue'
 import { useModalStore } from '@/stores/useModalStore.js'
-import { useListItems } from '@/stores/useListItems.js'
+import { useReminderStore } from '@/stores/useReminderStore.js'
 
-const tasks = useListItems()
 const modal = useModalStore()
+const reminderStore = useReminderStore()
 
 const props = defineProps({
-  edit: { required: false }
+  view: {
+    required: false
+  }
 })
 
 onBeforeMount(() => {
-  if (props.edit) {
-    state.id = tasks.listItems[modal.indexStore].id
-    state.title = tasks.listItems[modal.indexStore].title
-    state.description = tasks.listItems[modal.indexStore].description
-    state.tags = tasks.listItems[modal.indexStore].tags
-    state.done = tasks.listItems[modal.indexStore].done
-    state.dropDown = tasks.listItems[modal.indexStore].dropDown
+  if (props.view) {
+    Object.assign(state, {
+      ...props.view,
+      due: props.view.due.slice(0, -4),
+      remindMe: props.view.remindMe.slice(0, -4)
+    })
   }
 })
-
+const error = ref('')
 const state = reactive({
-  id: '',
-  title: '',
-  description: '',
-  tags: [],
-  done: false,
-  dropDown: false
+  due: '',
+  recurring: true,
+  remindMe: '',
+  todo: ''
 })
-
-function handleClick(tag) {
-  if (state.tags.includes(tag)) {
-    state.tags.splice(state.tags.indexOf(`${tag}`), 1)
-  } else {
-    state.tags.push(`${tag}`)
-  }
-}
 
 function clearState() {
-  state.id = ''
-  state.title = ''
-  state.description = ''
-  state.tags = []
+  ;(state.due = ''), (state.recurring = true), (state.remindMe = ''), (state.todo = '')
 }
 
-function submit() {
-  if (props.edit) {
-    tasks.updateItem(modal.indexStore, state)
-    // tasks.listItems[modal.indexStore] = {...state};
+async function submit() {
+  const form = {
+    ...state,
+    remindMe: state.remindMe + ':00Z',
+    due: state.due + ':00Z'
+  }
+
+  const res = await reminderStore.addTodo(form)
+
+  if ((await res) == 'success') {
     clearState()
-    modal.changeEdit('off')
     modal.toggleIsModal()
-    tasks.addtoLocalStorage()
   } else {
-    state.id = tasks.lastIndex + 1
-    tasks.lastIndex = tasks.lastIndex + 1
-    tasks.addToList({ ...state })
-    clearState()
-    modal.toggleIsModal()
-    tasks.addtoLocalStorage()
+    error.value = res.error
   }
 }
 
@@ -75,37 +60,32 @@ function handleCancel() {
   <div v-if="modal.isModal" className="modal">
     <div className="topButtons">
       <button @click="handleCancel">Cancel</button>
-      <button @click="submit" className="add" :disabled="!state.title && !state.description">
+      <button
+        @click="submit"
+        className="add"
+        :disabled="!state.todo || !state.due || !state.recurring || !state.remindMe || props.view"
+      >
         Add
       </button>
     </div>
     <main>
+      <p v-if="error">{{ error }}</p>
       <label>
         <h3>Title</h3>
-        <input v-model="state.title" type="text" placeholder="add a title..." />
+        <input v-model="state.todo" type="text" placeholder="add a title..." />
       </label>
       <label>
-        <h3>Description</h3>
-        <textarea
-          v-model="state.description"
-          name=""
-          id=""
-          cols="80"
-          rows="5"
-          placeholder="add a description..."
-        ></textarea>
+        <h3>When is it Due?</h3>
+        <input v-model="state.due" type="datetime-local" />
       </label>
-      <h3>Tags</h3>
-      <ul>
-        <li
-          :name="tag"
-          @click="handleClick(tag, $event)"
-          v-for="(tag, index) in tags"
-          :key="`${tag}${index}`"
-        >
-          <SideButtons :type="tag" :select="true" :tags="props.edit && state.tags" />
-        </li>
-      </ul>
+      <label className="recurring">
+        <h3>Recurring:</h3>
+        <input v-model="state.recurring" type="checkbox" />
+      </label>
+      <label>
+        <h3>Set an Reminder</h3>
+        <input v-model="state.remindMe" type="datetime-local" />
+      </label>
     </main>
   </div>
 </template>
@@ -157,13 +137,28 @@ main {
 label {
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
   gap: 8px;
   margin: 24px 0px;
 }
 
+label.recurring {
+  flex-direction: row;
+  align-items: center;
+  column-gap: 16px;
+}
+
 input[type|='text'] {
+  width: 100%;
   border-radius: 8px;
   padding: 16px 8px;
+  border: 1px solid var(--raisin-black);
+}
+
+input {
+  padding: 8px 8px;
+  border-radius: 8px;
   border: 1px solid var(--raisin-black);
 }
 
