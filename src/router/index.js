@@ -39,7 +39,7 @@ router.beforeEach(async (to, from, next) => {
     if (isLoggedInEx.value) {
       next()
     } else {
-      next('/signup')
+      next('/ signup')
     }
   } else if (to.matched.some((record) => record.meta.isNotLoggedIn)) {
     if (isLoggedInEx.value) {

@@ -1,5 +1,27 @@
 <script setup>
+import {ref} from 'vue';
 import DisplayTime from './DisplayTime.vue'
+
+const props = defineProps({
+  data: {
+    required: true,
+    type: Object
+  },
+  index: {
+    required: false
+  },
+  onDelete: {
+    required: true
+  },
+  onDone: {
+    required: true
+  },
+  onItemClick: {
+    required: true
+  }
+})
+
+const data = ref(props.data)
 </script>
 
 <template>
@@ -10,7 +32,7 @@ import DisplayTime from './DisplayTime.vue'
   >
     <div className="itemHeader">
       <h2 :style="data?.done && { textDecoration: 'line-through' }">
-        {{ data.todo.length > 10 ? `${data.todo.slice(0, 14)}...` : data.todo }}
+        {{ data.todo.length > 10 ? `${data.todo.slice(0, 11)}...` : data.todo }}
       </h2>
       <button @click="onItemClick">See More</button>
     </div>
